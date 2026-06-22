@@ -44,6 +44,8 @@ pub enum RequestCredentialAttachmentFormatType {
     AnoncredsCredentialRequest1_0,
     #[serde(rename = "aries/ld-proof-vc-detail@v1.0")]
     AriesLdProofVcDetail1_0,
+    #[serde(rename = "didcomm/vc+sd-jwt-request@v1.0")]
+    DidcommVcSdJwtRequest1_0,
 }
 
 #[cfg(test)]

@@ -47,6 +47,8 @@ pub enum IssueCredentialAttachmentFormatType {
     AnoncredsCredential1_0,
     #[serde(rename = "hlindy/cred@v2.0")]
     HyperledgerIndyCredential2_0,
+    #[serde(rename = "didcomm/vc+sd-jwt@v1.0")]
+    DidcommVcSdJwt1_0,
 }
 
 #[cfg(test)]
