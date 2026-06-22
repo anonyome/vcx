@@ -20,6 +20,10 @@ pub struct RequestCredentialV2Content {
     pub formats: Vec<AttachmentFormatSpecifier<RequestCredentialAttachmentFormatType>>,
     #[serde(rename = "requests~attach")]
     pub requests_attach: Vec<Attachment>,
+    #[builder(default)]
+    #[serde(rename = "~attach")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attach: Option<Vec<Attachment>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Default, PartialEq, TypedBuilder)]
