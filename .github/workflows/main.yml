@@ -188,7 +188,7 @@ jobs:
   ##########################################################################################
   ##############################   DOCKER PUBLISH   ########################################
 
-  # TODO: disabled for now - remove vdrproxy entirely https://github.com/openwallet-foundation/vcx/issues/1330
+  # TODO: remove vdrproxy entirely https://github.com/openwallet-foundation/vcx/issues/1330
   publish-docker-vdrproxy:
     if: false
     runs-on: ubuntu-22.04
@@ -196,7 +196,6 @@ jobs:
       contents: read
       packages: write
     needs: [workflow-setup, build-docker-vdrproxy]
-    if: ${{ needs.workflow-setup.outputs.SKIP_CI != 'true' }}
     env:
       DOCKER_IMG_CACHED: ${{ needs.workflow-setup.outputs.DOCKER_IMG_CACHED_VDRPROXY }}
       PUBLISH_VERSION: ${{ needs.workflow-setup.outputs.PUBLISH_VERSION }}
