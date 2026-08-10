@@ -157,10 +157,8 @@ impl NonRevokedInterval {
         // - the new `from` value is later, smaller interval
         // - the new `from` value is Some if previouly was None
         match (self.from, to_compare.from) {
-            (Some(old_from), Some(new_from)) => {
-                if old_from.lt(&new_from) {
-                    self.from = to_compare.from;
-                }
+            (Some(old_from), Some(new_from)) if old_from.lt(&new_from) => {
+                self.from = to_compare.from;
             }
             (None, Some(_)) => self.from = to_compare.from,
             _ => (),
@@ -169,10 +167,8 @@ impl NonRevokedInterval {
         // - the new `to` value is earlier, smaller interval
         // - the new `to` value is Some if previouly was None
         match (self.to, to_compare.to) {
-            (Some(old_to), Some(new_to)) => {
-                if new_to.lt(&old_to) {
-                    self.to = to_compare.to;
-                }
+            (Some(old_to), Some(new_to)) if new_to.lt(&old_to) => {
+                self.to = to_compare.to;
             }
             (None, Some(_)) => self.to = to_compare.to,
             _ => (),

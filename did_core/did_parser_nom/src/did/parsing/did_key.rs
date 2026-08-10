@@ -18,7 +18,7 @@ fn parse_mb_value(input: &str) -> IResult<&str, &str> {
 }
 
 // did-key-format := did:key:<mb-value>
-pub(super) fn parse_did_key(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_did_key(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_key_method(input: &str) -> IResult<&str, &str> {
         delimited(char(':'), tag("key"), char(':'))(input)
     }

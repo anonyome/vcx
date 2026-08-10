@@ -53,7 +53,7 @@ fn parse_did_cheqd_unique_id(input: &str) -> IResult<&str, &str> {
     ))(input)
 }
 
-pub(super) fn parse_did_cheqd(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_did_cheqd(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_cheqd_method(input: &str) -> IResult<&str, &str> {
         delimited(char(':'), tag("cheqd"), char(':'))(input)
     }

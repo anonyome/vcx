@@ -70,7 +70,7 @@ pub(super) fn general_did_id(input: &str) -> IResult<&str, &str> {
 }
 
 // did = "did:" method-name ":" method-specific-id
-pub(super) fn parse_qualified_did(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_qualified_did(input: &str) -> IResult<&str, DidPart<'_>> {
     let (input_left, (prefix, method, id)) =
         tuple((tag("did"), method_name, general_did_id))(input)?;
 

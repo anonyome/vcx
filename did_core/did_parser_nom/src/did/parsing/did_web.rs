@@ -8,7 +8,7 @@ use nom::{
 
 use super::DidPart;
 
-pub(super) fn parse_did_web(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_did_web(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_web_method(input: &str) -> IResult<&str, &str> {
         delimited(char(':'), tag("web"), char(':'))(input)
     }

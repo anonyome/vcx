@@ -17,7 +17,7 @@ fn check_4(input: &str) -> IResult<&str, &str> {
     peek(tag("4"))(input)
 }
 
-pub(super) fn parse_did_peer_4(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_did_peer_4(input: &str) -> IResult<&str, DidPart<'_>> {
     let ret = tuple((tag("did"), did_peer_method, check_4, cut(general_did_id)))(input);
     let (input_left, (prefix, method, _peek, id)) = ret?;
     Ok((input_left, (prefix, method, None, id)))

@@ -23,7 +23,7 @@ where
         })
     }
 
-    pub fn deserialize(data: &str) -> VcxResult<ObjectWithVersion<T>>
+    pub fn deserialize(data: &str) -> VcxResult<ObjectWithVersion<'_, T>>
     where
         T: ::serde::de::DeserializeOwned,
     {

@@ -98,7 +98,7 @@ fn parse_did_ranges_with_empty_allowed(input: &str) -> IResult<&str, DidRanges> 
 }
 
 // did-url-remaining = path-abempty [ "?" query ] [ "#" fragment ]
-fn parse_url_part(input: &str) -> IResult<&str, UrlPart> {
+fn parse_url_part(input: &str) -> IResult<&str, UrlPart<'_>> {
     let (remaining, path) = path_abempty(input)?;
     let (remaining, queries) = opt(preceded(tag("?"), cut(query_parser)))(remaining)?;
     let (remaining, fragment) =

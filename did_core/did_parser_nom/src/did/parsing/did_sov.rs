@@ -38,7 +38,7 @@ pub(super) fn parse_unqualified_sovrin_did(input: &str) -> IResult<&str, &str> {
 // The specification seems to contradict practice?
 // sovrin-did = "did:sov:" idstring *(":" subnamespace)
 // subnamespace = ALPHA *(ALPHA / DIGIT / "_" / "-")
-pub(super) fn parse_qualified_sovrin_did(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_qualified_sovrin_did(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_sov_method(input: &str) -> IResult<&str, &str> {
         delimited(char(':'), tag("sov"), char(':'))(input)
     }

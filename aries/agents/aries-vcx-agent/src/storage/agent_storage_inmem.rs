@@ -26,7 +26,7 @@ where
         }
     }
 
-    fn lock_store_read(&self) -> AgentResult<RwLockReadGuard<HashMap<String, Mutex<T>>>> {
+    fn lock_store_read(&self) -> AgentResult<RwLockReadGuard<'_, HashMap<String, Mutex<T>>>> {
         match self.store.read() {
             Ok(g) => Ok(g),
             Err(e) => Err(AgentError::from_msg(
@@ -39,7 +39,7 @@ where
         }
     }
 
-    fn lock_store_write(&self) -> AgentResult<RwLockWriteGuard<HashMap<String, Mutex<T>>>> {
+    fn lock_store_write(&self) -> AgentResult<RwLockWriteGuard<'_, HashMap<String, Mutex<T>>>> {
         match self.store.write() {
             Ok(g) => Ok(g),
             Err(e) => {
