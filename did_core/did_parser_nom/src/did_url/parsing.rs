@@ -6,8 +6,8 @@ use nom::{
     character::complete::{char, one_of, satisfy},
     combinator::{all_consuming, cut, opt, recognize, success},
     multi::{many0, many1, separated_list0},
-    sequence::{preceded, separated_pair, tuple},
-    AsChar, IResult,
+    sequence::{preceded, separated_pair},
+    AsChar, IResult, Parser,
 };
 
 type UrlPart<'a> = (&'a str, Option<Vec<(&'a str, &'a str)>>, Option<&'a str>);
@@ -29,11 +29,12 @@ fn is_sub_delims(c: char) -> bool {
 
 // pct-encoded = "%" HEXDIG HEXDIG
 fn pct_encoded(input: &str) -> IResult<&str, &str> {
-    recognize(tuple((
+    recognize((
         tag("%"),
         satisfy(|c| c.is_hex_digit()),
         satisfy(|c| c.is_hex_digit()),
-    )))(input)
+    ))
+    .parse(input)
 }
 
 // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
@@ -44,65 +45,68 @@ fn pchar(input: &str) -> IResult<&str, &str> {
         recognize(satisfy(is_sub_delims)),
         tag(":"),
         tag("@"),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 // segment = *pchar
 fn segment(input: &str) -> IResult<&str, &str> {
-    recognize(many1(pchar))(input)
+    recognize(many1(pchar)).parse(input)
 }
 
 // path-abempty = *( "/" segment )
 fn path_abempty(input: &str) -> IResult<&str, &str> {
-    recognize(many0(preceded(tag("/"), segment)))(input)
+    recognize(many0(preceded(tag("/"), segment))).parse(input)
 }
 
 // fragment = *( pchar / "/" / "?" )
 pub(super) fn fragment_parser(input: &str) -> IResult<&str, &str> {
     fn fragment_element(input: &str) -> IResult<&str, &str> {
-        alt(((pchar), tag("/"), tag("?")))(input)
+        alt((pchar, tag("/"), tag("?"))).parse(input)
     }
 
-    recognize(many1(fragment_element))(input)
+    recognize(many1(fragment_element)).parse(input)
 }
 
 // query = *( pchar / "/" / "?" )
 fn query_key_value_pair(input: &str) -> IResult<&str, (&str, &str)> {
     fn query_element(input: &str) -> IResult<&str, &str> {
-        alt(((pchar), tag("/"), tag("?")))(input)
+        alt((pchar, tag("/"), tag("?"))).parse(input)
     }
 
     let (remaining, (key, value)) = cut(separated_pair(
         take_while1(|c| !"=&#".contains(c)),
         char('='),
         alt((take_while1(|c| !"&#?".contains(c)), success(""))),
-    ))(input)?;
+    ))
+    .parse(input)?;
 
-    cut(all_consuming(many1(query_element)))(key)?;
+    cut(all_consuming(many1(query_element))).parse(key)?;
     if !value.is_empty() {
-        cut(all_consuming(many1(query_element)))(value)?;
+        cut(all_consuming(many1(query_element))).parse(value)?;
     }
 
     Ok((remaining, (key, value)))
 }
 
 fn query_parser(input: &str) -> IResult<&str, Vec<(&str, &str)>> {
-    separated_list0(one_of("&?"), query_key_value_pair)(input)
+    separated_list0(one_of("&?"), query_key_value_pair).parse(input)
 }
 
 fn parse_did_ranges_with_empty_allowed(input: &str) -> IResult<&str, DidRanges> {
     alt((
         parse_did_ranges,
         success(Default::default()), // Relative DID URL
-    ))(input)
+    ))
+    .parse(input)
 }
 
 // did-url-remaining = path-abempty [ "?" query ] [ "#" fragment ]
 fn parse_url_part(input: &str) -> IResult<&str, UrlPart<'_>> {
     let (remaining, path) = path_abempty(input)?;
-    let (remaining, queries) = opt(preceded(tag("?"), cut(query_parser)))(remaining)?;
+    let (remaining, queries) = opt(preceded(tag("?"), cut(query_parser))).parse(remaining)?;
     let (remaining, fragment) =
-        opt(preceded(tag("#"), cut(all_consuming(fragment_parser))))(remaining)?;
+        opt(preceded(tag("#"), cut(all_consuming(fragment_parser)))).parse(remaining)?;
     Ok((remaining, (path, queries, fragment)))
 }
 
@@ -162,7 +166,7 @@ pub fn parse_did_url(did_url: String) -> Result<DidUrl, ParseError> {
 
     let (remaining, did_ranges) = parse_did_ranges_with_empty_allowed(&did_url)?;
 
-    let (_, url_part) = all_consuming(parse_url_part)(remaining)?;
+    let (_, url_part) = all_consuming(parse_url_part).parse(remaining)?;
 
     validate_result_not_empty(&url_part, &did_ranges)?;
 

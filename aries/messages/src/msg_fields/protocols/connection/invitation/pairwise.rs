@@ -10,27 +10,18 @@ pub type PairwiseDidInvitationContent = PwInvitationContent<Did>;
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
-#[builder(build_method(vis="", name=__build))]
+#[builder(build_method(into = InvitationContent))]
 #[builder(builder_type(vis = "pub"))]
-pub struct PwInvitationContent<T> {
+pub struct PwInvitationContent<T>
+where
+    PwInvitationContent<T>: Into<InvitationContent>,
+{
     pub label: String,
     pub recipient_keys: Vec<String>,
     #[builder(default)]
     #[serde(default)]
     pub routing_keys: Vec<String>,
     pub service_endpoint: T,
-}
-
-#[allow(dead_code, non_camel_case_types, missing_docs)]
-impl<T, __routing_keys: ::typed_builder::Optional<Vec<String>>>
-    PwInvitationContentBuilder<T, ((String,), (Vec<String>,), __routing_keys, (T,))>
-where
-    PwInvitationContent<T>: Into<InvitationContent>,
-{
-    #[allow(clippy::default_trait_access)]
-    pub fn build(self) -> InvitationContent {
-        self.__build().into()
-    }
 }
 
 #[cfg(test)]

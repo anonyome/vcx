@@ -9,7 +9,7 @@ use did_cheqd::parse_did_cheqd;
 use nom::{
     branch::alt,
     combinator::{all_consuming, map},
-    IResult,
+    IResult, Parser,
 };
 
 use self::{
@@ -73,7 +73,8 @@ pub fn parse_did_ranges(input: &str) -> IResult<&str, DidRanges> {
         map(parse_qualified_sovrin_did, to_did_ranges),
         map(parse_qualified_did, to_did_ranges),
         map(parse_unqualified_sovrin_did, to_id_range),
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub fn parse_did(did: String) -> Result<Did, ParseError> {
@@ -81,7 +82,7 @@ pub fn parse_did(did: String) -> Result<Did, ParseError> {
         return Err(ParseError::InvalidInput("Empty input"));
     }
 
-    let (_, (method, namespace, id)) = all_consuming(parse_did_ranges)(&did)?;
+    let (_, (method, namespace, id)) = all_consuming(parse_did_ranges).parse(&did)?;
     let id = id.ok_or_else(|| ParseError::InvalidInput("Invalid DID"))?;
 
     if id.end > did.len() {

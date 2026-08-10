@@ -6,30 +6,30 @@ use nom::{
     character::complete::{alphanumeric1, char, one_of},
     combinator::{cut, recognize},
     multi::count,
-    sequence::{delimited, terminated, tuple},
-    IResult,
+    sequence::{delimited, terminated},
+    IResult, Parser,
 };
 
 use super::{did_sov::parse_unqualified_sovrin_did, DidPart, HEX_DIGIT_CHARS};
 
 // namespace = 1*namespace-char ":" ...
 fn did_cheqd_namespace(input: &str) -> IResult<&str, &str> {
-    terminated(alphanumeric1, tag(":"))(input)
+    terminated(alphanumeric1, tag(":")).parse(input)
 }
 
 // Parser for a single hexDigit
 fn hex_digit_char(input: &str) -> IResult<&str, char> {
-    one_of(HEX_DIGIT_CHARS)(input)
+    one_of(HEX_DIGIT_CHARS).parse(input)
 }
 
 // Parser for hexOctet (2 hex digits)
 fn parse_hex_octet(input: &str) -> IResult<&str, &str> {
-    recognize(count(hex_digit_char, 2))(input)
+    recognize(count(hex_digit_char, 2)).parse(input)
 }
 
 // https://datatracker.ietf.org/doc/html/rfc4122#section-3
 fn parse_uuid(input: &str) -> IResult<&str, &str> {
-    recognize(tuple((
+    recognize((
         count(parse_hex_octet, 4), // time-low
         tag("-"),
         count(parse_hex_octet, 2), // time mid
@@ -40,7 +40,8 @@ fn parse_uuid(input: &str) -> IResult<&str, &str> {
         count(parse_hex_octet, 1), // clock sequence low
         tag("-"),
         count(parse_hex_octet, 6), // node
-    )))(input)
+    ))
+    .parse(input)
 }
 
 // unique-id       = *id-char / UUID
@@ -50,19 +51,21 @@ fn parse_did_cheqd_unique_id(input: &str) -> IResult<&str, &str> {
     alt((
         recognize(parse_unqualified_sovrin_did), // indy-style DID ID
         recognize(parse_uuid),                   // UUID-style DID ID
-    ))(input)
+    ))
+    .parse(input)
 }
 
 pub(super) fn parse_did_cheqd(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_cheqd_method(input: &str) -> IResult<&str, &str> {
-        delimited(char(':'), tag("cheqd"), char(':'))(input)
+        delimited(char(':'), tag("cheqd"), char(':')).parse(input)
     }
-    let (input_left, (prefix, method, namespace, id)) = tuple((
+    let (input_left, (prefix, method, namespace, id)) = (
         tag("did"),
         did_cheqd_method,
         cut(did_cheqd_namespace),
         cut(parse_did_cheqd_unique_id),
-    ))(input)?;
+    )
+        .parse(input)?;
 
     Ok((input_left, (prefix, method, Some(namespace), id)))
 }
