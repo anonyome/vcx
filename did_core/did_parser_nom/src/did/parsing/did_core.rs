@@ -42,7 +42,7 @@ fn method_name(input: &str) -> IResult<&str, &str> {
 fn method_specific_id_optional_repeat(input: &str) -> IResult<&str, &str> {
     log::trace!("did_core::method_specific_id_optional_repeat >> input: {input:?}");
     let ret = recognize(many0(terminated(many0(idchar), char(':')))).parse(input); // First half of DID Syntax ABNF rule method-specific-id: *( *idchar ":"
-                                                                             // )recognize(many1(idchar))(input)
+                                                                                   // )recognize(many1(idchar))(input)
     log::trace!("did_core::method_specific_id_optional_repeat >> ret: {ret:?}");
     ret
 }

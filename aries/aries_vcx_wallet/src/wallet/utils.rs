@@ -1,4 +1,4 @@
-use rand::{RngExt, distr::Alphanumeric};
+use rand::{distr::Alphanumeric, RngExt};
 
 use crate::errors::error::VcxWalletResult;
 
