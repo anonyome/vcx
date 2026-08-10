@@ -119,14 +119,14 @@ jobs:
   ##########################################################################################
   ##############################   DOCKER BUILD   ##########################################
 
-  # todo: move to indy-vdr repo
+  # TODO: disabled for now - remove vdrproxy entirely https://github.com/openwallet-foundation/vcx/issues/1330
   build-docker-vdrproxy:
+    if: false
     runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
     needs: [workflow-setup]
-    if: ${{ needs.workflow-setup.outputs.SKIP_CI != 'true' }}
     env:
       DOCKER_IMG_CACHED: ${{ needs.workflow-setup.outputs.DOCKER_IMG_CACHED_VDRPROXY }}
       BRANCH_NAME: ${{ needs.workflow-setup.outputs.BRANCH_NAME }}
@@ -188,13 +188,14 @@ jobs:
   ##########################################################################################
   ##############################   DOCKER PUBLISH   ########################################
 
+  # TODO: remove vdrproxy entirely https://github.com/openwallet-foundation/vcx/issues/1330
   publish-docker-vdrproxy:
+    if: false
     runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
     needs: [workflow-setup, build-docker-vdrproxy]
-    if: ${{ needs.workflow-setup.outputs.SKIP_CI != 'true' }}
     env:
       DOCKER_IMG_CACHED: ${{ needs.workflow-setup.outputs.DOCKER_IMG_CACHED_VDRPROXY }}
       PUBLISH_VERSION: ${{ needs.workflow-setup.outputs.PUBLISH_VERSION }}
@@ -286,7 +287,9 @@ jobs:
       - name: "Run aries-vcx integration tests"
         run: just test-integration-aries-vcx ${{ matrix.wallet }}
 
+  # TODO: disabled for now - remove vdrproxy entirely https://github.com/openwallet-foundation/vcx/issues/1330
   test-integration-aries-vcx-vdrproxy:
+    if: false
     needs: [workflow-setup, build-docker-vdrproxy]
     runs-on: ubuntu-22.04
     env:
