@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 nom.workspace = true
-serde.workspace = true
+serde = { workspace = true, features = ["alloc"] }
 log.workspace = true
 percent-encoding.workspace = true
 

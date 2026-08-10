@@ -4,7 +4,7 @@ use aries_vcx_agent::{
     aries_vcx::aries_vcx_wallet::wallet::askar::AskarWallet, build_askar_wallet,
     Agent as AriesAgent, WalletInitConfig,
 };
-use rand::{rng, Rng};
+use rand::{rng, RngExt};
 use reqwest::Url;
 
 #[derive(Debug, Deserialize)]

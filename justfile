@@ -1,3 +1,5 @@
+export CMAKE_POLICY_VERSION_MINIMUM := "3.5"
+
 default:
     just --list
 

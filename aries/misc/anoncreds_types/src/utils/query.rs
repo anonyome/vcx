@@ -417,7 +417,7 @@ fn parse_single_operator(
 
 #[cfg(test)]
 mod tests {
-    use rand::{distr::Alphanumeric, rng, Rng};
+    use rand::{distr::Alphanumeric, rng, RngExt};
     use serde_json::json;
 
     use super::*;

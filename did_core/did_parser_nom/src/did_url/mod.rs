@@ -2,7 +2,7 @@ mod parsing;
 
 use std::{collections::HashMap, fmt::Display, str::FromStr};
 
-use nom::combinator::all_consuming;
+use nom::{combinator::all_consuming, Parser};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use self::parsing::{fragment_parser, parse_did_url};
@@ -74,7 +74,7 @@ impl DidUrl {
 
     // TODO: Ideally we would have a builder instead of purpose-specific constructors
     pub fn from_fragment(fragment: String) -> Result<Self, ParseError> {
-        if all_consuming(fragment_parser)(&fragment).is_err() {
+        if all_consuming(fragment_parser).parse(&fragment).is_err() {
             return Err(ParseError::InvalidInput("Invalid fragment"));
         }
         let len = fragment.len();

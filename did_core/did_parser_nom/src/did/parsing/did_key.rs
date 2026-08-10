@@ -2,8 +2,8 @@ use nom::{
     bytes::complete::{tag, take_while1},
     character::complete::char,
     combinator::{cut, fail, opt, recognize},
-    sequence::{delimited, tuple},
-    IResult,
+    sequence::delimited,
+    IResult, Parser,
 };
 
 use super::{DidPart, BASE58CHARS};
@@ -14,21 +14,22 @@ fn is_base58char(c: char) -> bool {
 
 // mb-value       := z[a-km-zA-HJ-NP-Z1-9]+
 fn parse_mb_value(input: &str) -> IResult<&str, &str> {
-    recognize(tuple((char('z'), take_while1(is_base58char))))(input)
+    recognize((char('z'), take_while1(is_base58char))).parse(input)
 }
 
 // did-key-format := did:key:<mb-value>
-pub(super) fn parse_did_key(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_did_key(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_key_method(input: &str) -> IResult<&str, &str> {
-        delimited(char(':'), tag("key"), char(':'))(input)
+        delimited(char(':'), tag("key"), char(':')).parse(input)
     }
 
-    let (input_left, (prefix, method, namespace, id)) = tuple((
+    let (input_left, (prefix, method, namespace, id)) = (
         tag("did"),
         did_key_method,
-        opt(fail::<_, &str, _>),
+        opt(fail::<_, &str, _>()),
         cut(parse_mb_value),
-    ))(input)?;
+    )
+        .parse(input)?;
 
     Ok((input_left, (prefix, method, namespace, id)))
 }

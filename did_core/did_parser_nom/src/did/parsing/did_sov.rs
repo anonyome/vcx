@@ -4,21 +4,21 @@ use nom::{
     character::complete::{char, one_of},
     combinator::{all_consuming, cut, opt, recognize},
     multi::{many1, many_m_n},
-    sequence::{delimited, tuple},
-    IResult,
+    sequence::delimited,
+    IResult, Parser,
 };
 
 use super::{DidPart, BASE58CHARS};
 use crate::did::parsing::did_core::idchar;
 
 fn base58char(input: &str) -> IResult<&str, &str> {
-    recognize(one_of(BASE58CHARS))(input)
+    recognize(one_of(BASE58CHARS)).parse(input)
 }
 
 // namespace =  *idchar ":"
 fn did_sov_namespace(input: &str) -> IResult<&str, &str> {
     if let Some((before_last_colon, after_last_colon)) = input.rsplit_once(':') {
-        match cut(all_consuming(many1(alt((idchar, tag(":"))))))(before_last_colon) {
+        match cut(all_consuming(many1(alt((idchar, tag(":")))))).parse(before_last_colon) {
             Ok(_) => Ok((after_last_colon, before_last_colon)),
             Err(err) => Err(err),
         }
@@ -32,22 +32,23 @@ fn did_sov_namespace(input: &str) -> IResult<&str, &str> {
 
 // idstring = 21*22(base58char)
 pub(super) fn parse_unqualified_sovrin_did(input: &str) -> IResult<&str, &str> {
-    recognize(many_m_n(21, 22, base58char))(input)
+    recognize(many_m_n(21, 22, base58char)).parse(input)
 }
 
 // The specification seems to contradict practice?
 // sovrin-did = "did:sov:" idstring *(":" subnamespace)
 // subnamespace = ALPHA *(ALPHA / DIGIT / "_" / "-")
-pub(super) fn parse_qualified_sovrin_did(input: &str) -> IResult<&str, DidPart> {
+pub(super) fn parse_qualified_sovrin_did(input: &str) -> IResult<&str, DidPart<'_>> {
     fn did_sov_method(input: &str) -> IResult<&str, &str> {
-        delimited(char(':'), tag("sov"), char(':'))(input)
+        delimited(char(':'), tag("sov"), char(':')).parse(input)
     }
-    let (input_left, (prefix, method, namespace, id)) = tuple((
+    let (input_left, (prefix, method, namespace, id)) = (
         tag("did"),
         did_sov_method,
         opt(did_sov_namespace),
         cut(parse_unqualified_sovrin_did),
-    ))(input)?;
+    )
+        .parse(input)?;
 
     Ok((input_left, (prefix, method, namespace, id)))
 }
