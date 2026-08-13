@@ -6,6 +6,7 @@ pub mod offer_credential;
 pub mod problem_report;
 pub mod propose_credential;
 pub mod request_credential;
+pub mod w3c_vc_sd_jwt_attachment;
 
 use std::str::FromStr;
 

@@ -49,6 +49,8 @@ pub enum OfferCredentialAttachmentFormatType {
     AnoncredsCredentialOffer1_0,
     #[serde(rename = "aries/ld-proof-vc-detail@v1.0")]
     AriesLdProofVcDetail1_0,
+    #[serde(rename = "didcomm/w3c-vc-sd-jwt-offer@v1.0")]
+    DidcommW3cVcSdJwtOffer1_0,
 }
 
 #[cfg(test)]
