@@ -23,7 +23,7 @@ To use `aries_vcx` in your project, you need to add GitHub dependency to your `C
 define a version through a `tag`:
 
 ```toml
-aries-vcx = { tag = "0.67.0", git = "https://github.com/openwallet-foundation/vcx" }
+aries-vcx = { tag = "0.68.0", git = "https://github.com/openwallet-foundation/vcx" }
 ```
 
 It's also advisable to follow these [instructions](TUTORIAL.md) to check your environment is properly configured.
