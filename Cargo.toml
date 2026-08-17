@@ -33,7 +33,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.67.0"
+version = "0.68.0"
 authors = ["OpenWallet Foundation"]
 description = "Library to work with Aries protocols & collection of supporting components"
 license = "Apache-2.0"
